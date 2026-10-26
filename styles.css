@@ -16,3 +16,10 @@ footer{text-align:center;padding:26px 0 0;color:#7a5a27}footer p{font-style:ital
 
 /* Clear, editable attendee-name fields */
 .attendee-heading{font-size:13px;font-weight:bold;color:#4d3b24;margin-bottom:10px}.attendee-heading>span{color:#9b5f05}.attendee-heading small{display:block;font-size:11px;font-weight:normal;color:#84745e;margin-top:3px}.attendee-name-inputs{align-items:start}.attendee-name-item{min-width:0;margin-bottom:12px}.attendee-name-label{display:block;font:700 12px Arial,sans-serif!important;margin:0 0 5px!important;color:#4d3b24}.attendee-name-item input{position:relative;z-index:1;pointer-events:auto;background:#fff!important;cursor:text}
+
+
+/* Fr. Pau anniversary portrait */
+.priest-portrait{width:min(360px,82%);margin:18px auto 20px;padding:8px;background:linear-gradient(145deg,#f6e4b0,#b98527,#fff4d2,#9a6819);border-radius:190px 190px 18px 18px;box-shadow:0 12px 28px rgba(105,73,22,.16)}
+.priest-portrait img{display:block;width:100%;height:auto;max-height:470px;object-fit:contain;object-position:center top;border-radius:182px 182px 12px 12px;background:#fffdf8}
+.priest-portrait figcaption{font:italic 10px/1.5 Arial,sans-serif;text-align:center;color:#76521c;padding:7px 5px 2px}
+@media(max-width:600px){.priest-portrait{width:min(300px,88%);margin:15px auto 18px}.priest-portrait img{max-height:390px}}
