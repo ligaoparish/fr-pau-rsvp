@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#8b5e16">
+  <title>FR. PAU 25 | Anniversary RSVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <div class="ornament top-ornament" aria-hidden="true">✦ ───────── ✝ ───────── ✦</div>
+    <header class="hero">
+      <p class="eyebrow">A GRACE-FILLED MILESTONE</p>
+      <h1><span>25th</span><br>Presbyteral Anniversary</h1>
+      <div class="rule"></div>
+      <p class="priest-name">Rev. Fr. Paulo Baria Barandon</p>
+      <p class="intro">With grateful hearts, we invite you to confirm your attendance at this special celebration of priestly vocation, faithful service, and love for God's people.</p>
+    </header>
+
+    <section class="event-card" aria-label="Event details">
+      <div class="event-row"><span class="event-icon">✦</span><div><strong>THANKSGIVING MASS</strong><p>Wednesday, December 9, 2026 · 3:30 PM</p><p>St. Stephen the Protomartyr Parish<br>Ligao City, Albay</p></div></div>
+      <div class="event-row"><span class="event-icon">❖</span><div><strong>RECEPTION</strong><p>To follow after the Holy Mass</p><p>Ligao City Gymnasium<br>Binatagan, Ligao City</p></div></div>
+    </section>
+
+    <section class="form-card">
+      <div class="section-heading">
+        <p class="eyebrow">KINDLY RESPOND</p>
+        <h2>RSVP</h2>
+        <p>Please complete the form below. Your reservation will be confirmed automatically after successful submission.</p>
+      </div>
+      <form id="rsvp-form">
+        <label>Full name <span>*</span><input name="full_name" autocomplete="name" maxlength="120" required placeholder="Enter your full name"></label>
+        <div class="form-grid">
+          <label>Contact number <span>*</span><input name="phone" autocomplete="tel" maxlength="30" required placeholder="09XX XXX XXXX"></label>
+          <label>Email address <small>(optional)</small><input name="email" type="email" autocomplete="email" maxlength="160" placeholder="you@example.com"></label>
+        </div>
+        <label>Parish or organization <small>(optional)</small><input name="affiliation" maxlength="120" placeholder="Your parish or organization"></label>
+        <label>Will you attend? <span>*</span>
+          <select name="attendance" id="attendance" required>
+            <option value="">Select your response</option>
+            <option value="attending">Yes, I will attend</option>
+            <option value="declined">I am unable to attend</option>
+          </select>
+        </label>
+        <div id="guest-fields">
+          <label>Number of seats reserved for you (shown in the invitation) <span>*</span>
+            <select name="seats" id="seats">
+              <option value="1">1 seat</option><option value="2">2 seats</option><option value="3">3 seats</option>
+              <option value="4">4 seats</option><option value="5">5 seats</option><option value="6">6 seats</option>
+              <option value="7">7 seats</option><option value="8">8 seats</option><option value="9">9 seats</option><option value="10">10 seats</option>
+            </select>
+          </label>
+          <div class="attendee-names-field" id="attendee-names-section">
+            <div class="attendee-heading">Enter the full name of each person covered by your reservation <span>*</span><small>Check your invitation and select the number of seats stated there. Then enter one full name for each reserved seat, including yourself.</small></div>
+            <div id="attendee-name-inputs" class="attendee-name-inputs"></div>
+            <p class="field-help">For example, if your invitation reserves 3 seats, select “3 seats” and enter 3 names. The number of names must match the number of seats shown in your invitation.</p>
+          </div>
+        </div>
+        <label>Message or special request <small>(optional)</small><textarea name="message" rows="2" maxlength="1000" placeholder="Add a note for the organizers"></textarea></label>
+        <label class="consent"><input type="checkbox" name="consent" required><span>I understand that the information I provide will be used by the event organizers to manage this anniversary RSVP.</span></label>
+        <button id="submit-button" type="submit">Confirm my RSVP <span aria-hidden="true">→</span></button>
+        <p class="privacy-note">Please submit only one response per reservation. If you need to change your details later, contact the event organizers.</p>
+        <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+    <footer><p>“We are but earthen vessels holding this treasure.”</p><small>2 Corinthians 4:7</small><div class="ornament">✦ ───────── ✦ ───────── ✦</div></footer>
+  </main>
+  <script src="app.js?v=20261026b" defer></script>
+</body>
+</html>
