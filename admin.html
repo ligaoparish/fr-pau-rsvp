@@ -30,8 +30,8 @@
 </div>
 <script>
 /* Set these to your Supabase project URL and publishable/anon key. Never put a service-role key here. */
-const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+const SUPABASE_URL = "https://ohltaamhyutgyojedcyr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_8o2mbU2eTWNAzPLKMipeLg_bpKYKx\_-";
 let client = null, allRows = [];
 const byId = id => document.getElementById(id);
 function setupClient(){ if(SUPABASE_URL.includes("PASTE_YOUR") || SUPABASE_ANON_KEY.includes("PASTE_YOUR")) throw new Error("Configure the Supabase project URL and anon key in admin.html first."); client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }

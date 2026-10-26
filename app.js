@@ -2,7 +2,9 @@
   Configure RSVP_FUNCTION_URL with your deployed Supabase Edge Function URL.
   Example: https://YOUR_PROJECT_REF.supabase.co/functions/v1/submit-rsvp
 */
-const RSVP_FUNCTION_URL = "PASTE_YOUR_SUPABASE_EDGE_FUNCTION_URL_HERE";
+const SUPABASE_URL = "https://ohltaamhyutgyojedcyr.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8o2mbU2eTWNAzPLKMipeLg_bpKYKx\_-";
+const RSVP_FUNCTION_URL = "https://ohltaamhyutgyojedcyr.supabase.co/functions/v1/submit-rsvp";
 
 const form = document.getElementById("rsvp-form");
 const attendance = document.getElementById("attendance");
@@ -112,7 +114,7 @@ form.addEventListener("submit", async (event) => {
   try {
     const response = await fetch(RSVP_FUNCTION_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "apikey": SUPABASE_PUBLISHABLE_KEY },
       body: JSON.stringify(payload)
     });
     const result = await response.json().catch(() => ({}));
