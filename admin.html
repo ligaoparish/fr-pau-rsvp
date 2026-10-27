@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FR. PAU 25 | Admin</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .admin-wrap{max-width:1150px;margin:auto;padding:28px 18px 60px}.admin-title{font:700 clamp(24px,4vw,38px) Cinzel,Georgia,serif;color:#805313;text-align:center}.admin-panel{background:#fffdf7;border:1px solid #e6cf9e;border-radius:14px;padding:20px;margin:18px 0;box-shadow:0 8px 25px #76531a0d}.admin-panel h2{font:700 18px Cinzel,Georgia,serif;color:#805313;margin-top:0}.admin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#fff7e3;border:1px solid #ead7ad;border-radius:10px;padding:16px}.stat span{display:block;font:11px Arial,sans-serif;color:#78674d}.stat strong{font:700 27px Cinzel,Georgia,serif;color:#805313}.admin-input{width:100%;padding:11px;border:1px solid #dcc79c;border-radius:8px;margin:5px 0 12px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.admin-actions button{width:auto;padding:10px 14px}.secondary{background:#eee1c2;color:#543d1a}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font:12px Arial,sans-serif}th,td{text-align:left;padding:10px;border-bottom:1px solid #eee1c2;white-space:nowrap}th{color:#805313;background:#fff7e3}.hidden{display:none!important}.notice{font:12px Arial,sans-serif;color:#766957}.status{padding:5px 8px;border-radius:20px;background:#e8f4e8;color:#2b642e}.error-text{color:#9b2818}.admin-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.filter-controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;align-items:start}.filter-controls .admin-input{box-sizing:border-box;min-width:0}@media(max-width:700px){.admin-grid{grid-template-columns:repeat(2,1fr)}.filter-controls{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><div class="admin-wrap">
+  <p class="eyebrow" style="text-align:center">EVENT MANAGEMENT</p><h1 class="admin-title">FR. PAU 25 RSVP Dashboard</h1>
+  <section class="admin-panel" id="login-panel">
+    <h2>Administrator sign in</h2>
+    <p class="notice">Use an authorized Supabase account. Public visitors cannot access this dashboard.</p>
+    <form id="login-form"><label>Email address<input class="admin-input" id="email" type="email" required autocomplete="username"></label><label>Password<input class="admin-input" id="password" type="password" required autocomplete="current-password"></label><button type="submit">Sign in</button></form>
+    <p id="login-message" class="notice error-text"></p>
+  </section>
+  <div id="dashboard" class="hidden">
+    <div class="admin-top"><p class="notice" id="signed-in"></p><div class="admin-actions"><button class="secondary" id="refresh-btn">Refresh</button><button class="secondary" id="export-btn">Export CSV</button><button id="logout-btn">Sign out</button></div></div>
+    <div class="admin-grid">
+      <div class="stat"><span>Total responses</span><strong id="total">0</strong></div>
+      <div class="stat"><span>Confirmed attendees</span><strong id="attending">0</strong></div>
+      <div class="stat"><span>Unable to attend</span><strong id="declined">0</strong></div>
+      <div class="stat"><span>Reserved seats</span><strong id="seat-total">0</strong></div>
+    </div>
+    <section class="admin-panel">
+      <h2>Guest reservations</h2>
+      <div class="filter-controls">
+        <input class="admin-input" id="search" placeholder="Search name, phone, email, parish, or organization" aria-label="Search reservations">
+        <select class="admin-input" id="attendance-filter" aria-label="Filter by attendance">
+          <option value="">All attendance statuses</option>
+          <option value="attending">Attending</option>
+          <option value="declined">Unable to attend</option>
+        </select>
+        <select class="admin-input" id="affiliation-filter" aria-label="Filter by parish or organization">
+          <option value="">All parishes / organizations</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Contact</th><th>Parish / Organization</th><th>Attendance</th><th>Seats</th><th>Names of attendees</th><th>Submitted</th></tr></thead><tbody id="guest-rows"><tr><td colspan="7">Sign in to load reservations.</td></tr></tbody></table></div>
+      <p class="notice">Guest information is confidential. Download and share reports only with authorized event organizers.</p>
+    </section>
+  </div>
+</div>
+<script>
+/* Set these to your Supabase project URL and publishable/anon key. Never put a service-role key here. */
+const SUPABASE_URL = "https://ohltaamhyutgyojedcyr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_8o2mbU2eTWNAzPLKMipeLg_bpKYKx\_-";
+let client = null, allRows = [];
+const byId = id => document.getElementById(id);
+function setupClient(){ if(SUPABASE_URL.includes("PASTE_YOUR") || SUPABASE_ANON_KEY.includes("PASTE_YOUR")) throw new Error("Configure the Supabase project URL and anon key in admin.html first."); client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+byId("login-form").addEventListener("submit", async e => {
+  e.preventDefault(); byId("login-message").textContent = "";
+  try { if(!client) setupClient(); const {data,error}=await client.auth.signInWithPassword({email:byId("email").value,password:byId("password").value}); if(error) throw error; byId("signed-in").textContent="Signed in as "+data.user.email; await loadRows(); byId("login-panel").classList.add("hidden"); byId("dashboard").classList.remove("hidden"); }
+  catch(err){byId("login-message").textContent=err.message;}
+});
+async function loadRows(){
+  const {data:{user}}=await client.auth.getUser(); if(!user) throw new Error("Please sign in again.");
+  const {data:admin,error:adminError}=await client.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();
+  if(adminError || !admin) {await client.auth.signOut(); throw new Error("This account is not authorized as an event administrator.");}
+  const {data,error}=await client.from("rsvps").select("*").order("created_at",{ascending:false});
+  if(error) throw error;
+  allRows=data||[];
+
+  const affiliationSelect=byId("affiliation-filter");
+  const previousSelection=affiliationSelect.value;
+  const affiliations=[...new Set(allRows.map(r=>(r.affiliation||"").trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b));
+  affiliationSelect.replaceChildren();
+  const allOption=document.createElement("option");
+  allOption.value="";
+  allOption.textContent="All parishes / organizations";
+  affiliationSelect.appendChild(allOption);
+  affiliations.forEach(affiliation=>{
+    const option=document.createElement("option");
+    option.value=affiliation;
+    option.textContent=affiliation;
+    affiliationSelect.appendChild(option);
+  });
+  affiliationSelect.value=affiliations.includes(previousSelection)?previousSelection:"";
+  renderRows();
+}
+function renderRows(){
+  const q=byId("search").value.toLowerCase().trim();
+  const attendanceFilter=byId("attendance-filter").value;
+  const affiliationFilter=byId("affiliation-filter").value;
+  const rows=allRows.filter(r=>{
+    const searchableText=[r.full_name,r.phone,r.email,r.affiliation,r.guest_names,r.message].join(" ").toLowerCase();
+    return searchableText.includes(q)
+      && (!attendanceFilter || r.attendance===attendanceFilter)
+      && (!affiliationFilter || (r.affiliation||"").trim()===affiliationFilter);
+  });
+
+  // Statistics show all records, even while the table is filtered.
+  byId("total").textContent=allRows.length;
+  byId("attending").textContent=allRows.filter(r=>r.attendance==="attending").length;
+  byId("declined").textContent=allRows.filter(r=>r.attendance==="declined").length;
+  byId("seat-total").textContent=allRows.filter(r=>r.attendance==="attending").reduce((n,r)=>n+Number(r.seats||0),0);
+
+  const tbody=byId("guest-rows"); tbody.replaceChildren();
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="7">No matching reservations.</td></tr>';return;}
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
+    [r.full_name,r.phone||"",r.affiliation||"Not specified",
+     r.attendance==="attending"?"Attending":"Unable to attend",
+     r.attendance==="attending"?r.seats:0,r.guest_names||"",
+     new Date(r.created_at).toLocaleString()
+    ].forEach(v=>{const td=document.createElement("td");td.textContent=v??"";tr.appendChild(td);});
+    tbody.appendChild(tr);
+  });
+}
+byId("search").addEventListener("input",renderRows);
+byId("attendance-filter").addEventListener("change",renderRows);
+byId("affiliation-filter").addEventListener("change",renderRows);
+byId("refresh-btn").addEventListener("click",()=>loadRows().catch(e=>alert(e.message)));
+byId("logout-btn").addEventListener("click",async()=>{await client.auth.signOut();byId("dashboard").classList.add("hidden");byId("login-panel").classList.remove("hidden");});
+byId("export-btn").addEventListener("click",()=>{
+ const headers=["Name","Phone","Email","Affiliation","Attendance","Seats","Names of Attendees","Message","Submitted"];
+ const values=allRows.map(r=>[r.full_name,r.phone,r.email,r.affiliation,r.attendance,r.seats,r.guest_names,r.message,r.created_at]);
+ const csv=[headers,...values].map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"}));a.download="fr-pau-25-rsvp.csv";a.click();URL.revokeObjectURL(a.href);
+});
+</script></body></html>
